@@ -230,6 +230,8 @@ def device_info(meta):
     idx = 48
     device_strings = []
 
+    #print(repr(m3chr))
+
     for i in range(6):
         idx, s = findString(m3chr, idx)
         device_strings.append(s)
@@ -240,8 +242,9 @@ def device_info(meta):
 
 
 class HT301:
-    FRAME_WIDTH = 384
-    FRAME_HEIGHT = 292
+    FRAME_WIDTH = 256
+    FRAME_HEIGHT = 196
+    META_LINES = 4
 
     def __init__(self, video_dev = None):
         if video_dev == None:
@@ -329,6 +332,9 @@ class HT301:
         dt = np.dtype('<u2')
         #dt = np.dtype(np.uint16)
 
+        #print("frame: %r" % (frame,))
+        frame.tofile("frame.bin")
+
         if platform == "linux" or platform == "linux2":
             # Linux
             frame = frame.view(dtype=dt)
@@ -343,8 +349,9 @@ class HT301:
             frame = frame.reshape(self.FRAME_HEIGHT, self.FRAME_WIDTH)
 
         frame_raw = frame
-        f_visible = frame_raw[:frame_raw.shape[0] - 4,...]
-        meta      = frame_raw[frame_raw.shape[0] - 4:,...]
+        f_visible = frame_raw[:frame_raw.shape[0] - self.META_LINES,...]
+        meta      = frame_raw[frame_raw.shape[0] - self.META_LINES:,...]
+        #print("frame: %r" % ((f_visible, meta),))
         return ret, frame_raw, f_visible, meta
 
     def read(self):
@@ -355,6 +362,7 @@ class HT301:
             if device_strings[3] == 'T3-317-13': frame_ok = True
             else:
                 if debug > 0: print('frame meta no match:', device_strings)
+            frame_ok = True  #FIXME
         self.frame_raw = frame_raw
         self.frame = frame
         self.meta  = meta
