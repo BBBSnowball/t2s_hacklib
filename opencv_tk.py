@@ -66,8 +66,15 @@ class App(tk.Frame):
         self.draw_temp = False
         self.upscale_factor = 2
         self.verbose_info = True
+        self.pause = False
 
     def show_frame(self):
+        if self.pause:
+            # schedule ourselves again because I'm too lazy to do it properly
+            # (and the trivial alternative would have a race condition)
+            root.after(10, self.show_frame)
+            return
+
         ret, frame = self.cap.read()
         info, lut = self.cap.info()
         frame = frame.astype(np.float32)
@@ -226,6 +233,8 @@ class App(tk.Frame):
                 self.upscale_factor = 2
             else:
                 self.upscale_factor = 4
+        elif e.char == ' ':
+            self.pause = not self.pause
     def keyup(self, e):
         pass
 
