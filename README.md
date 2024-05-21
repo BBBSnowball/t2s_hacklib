@@ -1,30 +1,66 @@
-# t2s_hacklib
+# ht301_hacklib
+Thermal camera opencv python lib.
 
-Python library for [T2S+ thermal camera](https://www.banggood.com/freegift/INFIRAY-T2S+-Thermal-Imaging-Camera-256192-for-Smart-Phone-Type-C-Connector-PCB-Floor-Heat-Inspection-Infrared-Thermal-Imager-p-1990350-40.html).
+Supported thermal cameras:
+- Hti HT-301
+- Xtherm T3S, thanks to Angel-1024!
+- Xtherm T2L, T2S+, thanks to Christoph Mair
 
-This is based on [ht301_hacklib](https://github.com/ebachard/ht301_hacklib) but we haven't
-figured out what most of the metadata means, so we ignore it, for now. This means that you
-won't get any real temperature measurements.
+It's a very simple hacked together lib, might be useful for somebody,  
+uses `matplotlib` which is a little bit on the slow side,  
+or pure `opencv` - much faster but without most features
+
+Tested on ubuntu 20.04 and windows 11:
 
 ```
-$ nix-shell ./shell.nix  # or install Python libraries by some other method
-$ python3 opencv_tk.py
+$ ./pyplot.py
 keys:
+    'h'      - help
+    'q'      - quit
+    ' '      - pause, resume
+    'd'      - set diff
+    'x','c'  - enable/disable diff, enable/disable annotation diff
+    'f'      - full screen
     'u'      - calibrate
+    't'      - draw min, max, center temperature
+    'e'      - remove user temperature annotations
     'w'      - save to file date.png
+    'r'      - save raw data to file date.npy
+    ',', '.' - change color map
+    'a', 'z' - auto exposure on/off, auto exposure type
+    'k', 'l' - set the thermal range to normal/high (only for the TS2+)
+    'o'      - change the camera orientation (rotate 90 degs CW). Only in OpenCV
+    
+    left, right, up, down - set exposure limits
+
+mouse:
+    left  button - add Region Of Interest (ROI)
+    right button - add user temperature annotation
 ```
-
-![T2S+ debug UI](docs/t2s.png)
-
-How it should look like
-=======================
-
-**NOTE**: These pictures are with `ht301_hacklib`. We can't do this for T2S+, yet.
-
 ![pyplot output](docs/pyplot-output1.png)
 ![pyplot output](docs/pyplot-output2.png)
 
+View saved ('r' key) raw data file:
+```
+$ ./pyplot.py 2022-09-11_18-49-07.npy
+```
+
+Opencv version:
 ```
 $ ./opencv.py
 ```
 ![opencv output](docs/opencv-output.png)
+
+<br>
+
+## Related projects
+
+- https://gitlab.com/netman69/inficam
+- https://github.com/MCMH2000/OpenHD_HT301_Driver
+- https://github.com/sumpster/ht301_viewer
+- https://github.com/cmair/ht301_hacklib
+- https://github.com/mcguire-steve/ht301_ircam
+
+## Related materials
+- https://www.mdpi.com/1424-8220/17/8/1718
+
