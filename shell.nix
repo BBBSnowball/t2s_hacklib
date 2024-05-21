@@ -3,9 +3,10 @@ let
     py = pkgs.python3.withPackages (p: with p; [
         numpy
         matplotlib
-        opencv4
         pillow
+        opencv4
         #(opencv4.override {enableGtk3 = true; enableGtk2 = true;})
+        scikit-image
     ]);
 in
 with pkgs;

@@ -16,7 +16,7 @@ class App(tk.Frame):
         super().__init__(master)
         self.root = master
 
-        self.cap = ht301_hacklib.HT301()
+        self.cap = ht301_hacklib.Camera()
 
         self.grid()
         self.imgLabel = ttk.Label(self, image=None)
@@ -86,46 +86,43 @@ class App(tk.Frame):
         for j in range(0, per_line):
             s += " %4d" % j
         s += "\n"
-        for x in self.cap.meta:
-            for j in range(0, len(x), per_line):
-                s += "%04x:" % (2*i)
-                for k in range(j, min(j+per_line, len(x))):
-                    s += " %04x" % x[k]
-                    i += 1
-                if len(x) < j+per_line:
-                    for k in range(len(x), j+per_line):
-                        s += "     "
-                s += " | "
-                for k in range(j, min(j+per_line, len(x))):
-                    a = x[k] & 0xff
-                    if chr(a) >= ' ':
-                        s += chr(a)
-                    else:
-                        s += "."
-                    a = (x[k] >> 8) & 0xff
-                    if chr(a) >= ' ':
-                        s += chr(a)
-                    else:
-                        s += "."
-                s += "\n"
+        meta = self.cap.frame_raw_u16[self.cap.fourLinePara:]
+        for j in range(0, len(meta), per_line):
+            s += "%04x:" % (2*i)
+            for k in range(j, min(j+per_line, len(meta))):
+                s += " %04x" % meta[k]
+                i += 1
+            if len(meta) < j+per_line:
+                for k in range(len(meta), j+per_line):
+                    s += "     "
+            s += " | "
+            for k in range(j, min(j+per_line, len(meta))):
+                a = meta[k] & 0xff
+                if chr(a) >= ' ':
+                    s += chr(a)
+                else:
+                    s += "."
+                a = (meta[k] >> 8) & 0xff
+                if chr(a) >= ' ':
+                    s += chr(a)
+                else:
+                    s += "."
+            s += "\n"
         s += "min: %f\nmax: %f\n" % (frame_min, frame_max)
         s += "min: %f\nmax: %f\n" % (frame_min2, frame_max2)
-        s += "meta[0] = 0:%d, 1:%d, 16:%d\n" % (self.cap.meta[0][0], self.cap.meta[0][1], self.cap.meta[0][16])
-        s += "meta[1] = 0:%d, 1:%d\n" % (self.cap.meta[1][0], self.cap.meta[1][1])
+        s += "meta[0] = 0:%d, 1:%d, 16:%d\n" % (meta[0], meta[1], meta[16])
+        s += "meta[1] = 0:%d, 1:%d\n" % (meta[256], meta[257])
         s += "\n".join(self.history[-3:])
         self.metaLabel.text = s
         self.metaLabel.configure(text=s)
 
         if self.prev_meta is not None:
-            for y in range(len(self.cap.meta)):
-                prev = self.prev_meta[y]
-                curr = self.cap.meta[y]
-                for x in range(len(curr)):
-                    if prev[x] != curr[x] and (y,x) not in ((0,0), (0,1)):
-                        msg = "meta[%d][%d] changed from 0x%04x=%d to 0x%04x=%d" % (y, x, prev[x], prev[x], curr[x], curr[x])
-                        print(msg)
-                        self.history.append(msg)
-        self.prev_meta = self.cap.meta
+            for x in range(len(meta)):
+                if self.prev_meta[x] != meta[x] and x not in (0, 1):
+                    msg = "meta[%d] changed from 0x%04x=%d to 0x%04x=%d" % (x, self.prev_meta[x], self.prev_meta[x], meta[x], meta[x])
+                    print(msg)
+                    self.history.append(msg)
+        self.prev_meta = meta
 
         root.after(10, self.show_frame)
 
