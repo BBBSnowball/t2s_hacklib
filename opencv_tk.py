@@ -170,6 +170,13 @@ class App(tk.Frame):
             s += "calibrating...\n"
         if self.verbose_info:
             s += "\n".join(self.history[-3:]) + "\n"
+        for k in info:
+            v = info[k]
+            if isinstance(v, float) or isinstance(v, np.floating):
+                v = "%7.2f" % v
+            else:
+                v = repr(v)
+            s += "%-18s %s\n" % (k+":", v)
         self.metaLabel.text = s
         self.metaLabel.configure(text=s)
 
