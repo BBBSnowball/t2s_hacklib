@@ -130,7 +130,11 @@ def animate_func(i):
 
         if update_colormap:
             im.set_clim(exposure['T_min'], exposure['T_max'])
-            fig.canvas.resize_event()  #force update all, even with blit=True
+            try:
+                fig.canvas.resize_event()  #force update all, even with blit=True
+            except:
+                #print("Couldn't force resize event")
+                matplotlib.backend_bases.ResizeEvent("resize_event", fig.canvas)._process()
             update_colormap = False
             return []
 
